@@ -3,7 +3,7 @@ import {FaGoogle, FaTwitter, FaInstagram, FaYoutube} from 'react-icons/fa'
 import './index.css'
 
 const Footer = () => (
-  <div className="footer-container">
+  <footer className="footer-container">
     <div className="social-media-icons-container">
       <FaGoogle className="social-media-icons" />
       <FaTwitter className="social-media-icons" />
@@ -11,7 +11,7 @@ const Footer = () => (
       <FaYoutube className="social-media-icons" />
     </div>
     <p className="contact-us-text">Contact us</p>
-  </div>
+  </footer>
 )
 
 export default Footer

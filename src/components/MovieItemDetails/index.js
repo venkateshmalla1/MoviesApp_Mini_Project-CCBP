@@ -282,7 +282,7 @@ class MovieItemDetails extends Component {
           <>
             <Header />
             <div
-              testid="loader"
+              data-testid="loader"
               className="movie-details-page-loader-failure-container"
             >
               <Loader type="TailSpin" color="#D81F26" height={50} width={50} />
