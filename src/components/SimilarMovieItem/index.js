@@ -5,7 +5,7 @@ const SimilarMovieItem = props => {
   const {posterPath, title} = similarMovieDetails
   return (
     <img
-      testid="movieItem"
+      data-testid="movieItem"
       alt={title}
       className="similar-movie-image"
       src={posterPath}

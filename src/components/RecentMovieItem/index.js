@@ -7,7 +7,7 @@ const RecentMovieItem = props => {
   return (
     <Link to={`/movies/${id}`}>
       <img
-        testid="movieItem"
+        data-testid="movieItem"
         className="recent-movie-image"
         src={moviePoster}
         alt="recent movie"

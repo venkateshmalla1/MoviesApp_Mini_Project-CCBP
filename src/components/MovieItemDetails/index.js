@@ -140,10 +140,9 @@ class MovieItemDetails extends Component {
       )
       // console.log(formattedSimilarMoviesList)
       // spoken languages
-      const formattedSpokenLanguagesList =
-        data.movie_details.spoken_languages.map(eachLanguage =>
-          this.getFormattedSpokenLanguagesList(eachLanguage),
-        )
+      const formattedSpokenLanguagesList = data.movie_details.spoken_languages.map(
+        eachLanguage => this.getFormattedSpokenLanguagesList(eachLanguage),
+      )
       // console.log(formattedSpokenLanguagesList)
 
       this.setState({
@@ -184,8 +183,13 @@ class MovieItemDetails extends Component {
   }
 
   getMovieDetailsResultantView = () => {
-    const {movieDetails, genres, spokenLanguages, similarMovies, apiStatus} =
-      this.state
+    const {
+      movieDetails,
+      genres,
+      spokenLanguages,
+      similarMovies,
+      apiStatus,
+    } = this.state
 
     const {
       // backdropPath,
