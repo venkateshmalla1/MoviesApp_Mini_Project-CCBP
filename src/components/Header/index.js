@@ -1,11 +1,8 @@
 import {Component} from 'react'
-
 import {Link, withRouter} from 'react-router-dom'
 import {HiOutlineSearch} from 'react-icons/hi'
 import {GiHamburgerMenu} from 'react-icons/gi'
 import {RiCloseFill} from 'react-icons/ri'
-// import RequiredDataContext from '../../context/RequiredDataContext'
-
 import './index.css'
 
 const tabPathConstants = {
@@ -18,7 +15,6 @@ const tabPathConstants = {
 class Header extends Component {
   state = {
     displayHamburgerMenu: false,
-
     searchInput: '',
   }
 
@@ -34,7 +30,6 @@ class Header extends Component {
 
   navigateToSearchRoute = () => {
     const {history} = this.props
-
     history.push('/search')
   }
 
@@ -47,17 +42,8 @@ class Header extends Component {
     }
   }
 
-  onSearching = () => {
-    // e.preventDefault()
-    const {searchInput} = this.state
-    const {searchMovies} = this.props
-    if (searchInput !== '') {
-      searchMovies(searchInput)
-    }
-  }
-
   onSearchInput = e => {
-    this.setState({searchInput: e.target.value}, this.onSearching)
+    this.setState({searchInput: e.target.value})
   }
 
   togglingSearchBarDisplayResult = () => {
@@ -81,7 +67,6 @@ class Header extends Component {
           <div className="search-button-container">
             <button
               data-testid="searchButton"
-              onClick={this.onSearchBtnClick}
               className="search-icon-button"
               type="submit"
             >
@@ -106,32 +91,17 @@ class Header extends Component {
     )
   }
 
-  //   updateActiveTabId = e => {
-  //     // console.log(`the innerText is -->${e.target.innerText}<--`)
-  //     if (e.target.id === tabIdConstants.home) {
-  //       changeActiveTabId(e.target.id)
-  //     } else {
-  //       changeActiveTabId(e.target.innerText)
-  //     }
-  //   }
-
-  navigateToSearchRoute = () => {
-    const {history} = this.props
-    history.push('/search')
-    // changeActiveTabId(e.target.id)
-  }
-
   render() {
     const {displayHamburgerMenu} = this.state
     const {match} = this.props
     const {path} = match
-    // console.log(match)
 
     const homeClass = path === tabPathConstants.home ? 'active-tab-class' : ''
     const popularClass =
       path === tabPathConstants.popular ? 'active-tab-class' : ''
     const accountClass =
       path === tabPathConstants.account ? 'active-tab-class' : ''
+
     return (
       <nav className="header-nav-bar">
         <div className="nav-items-container">
@@ -149,7 +119,6 @@ class Header extends Component {
                   Home
                 </Link>
               </li>
-
               <li className={`menu-option ${popularClass}`}>
                 <Link className="menu-option-nav-link-item" to="/popular">
                   Popular
@@ -158,7 +127,6 @@ class Header extends Component {
             </ul>
             <div className="search-avatar-container">
               {this.togglingSearchBarDisplayResult()}
-
               <div className="profile-container">
                 <Link className="profile-nav-link-item" to="/account">
                   <img
@@ -168,7 +136,6 @@ class Header extends Component {
                   />
                 </Link>
               </div>
-
               <button
                 onClick={this.toggleHamburgerMenuDisplay}
                 type="button"
@@ -186,19 +153,16 @@ class Header extends Component {
                 Home
               </Link>
             </li>
-
             <li className={`menu-option-mobile ${popularClass}`}>
               <Link className="menu-option-nav-link-item" to="/popular">
                 Popular
               </Link>
             </li>
-
             <li className={`menu-option-mobile ${accountClass}`}>
               <Link className="menu-option-nav-link-item" to="/account">
                 Account
               </Link>
             </li>
-
             <li className="close-menu-option">
               <button
                 onClick={this.collapseHamburgerMenu}
