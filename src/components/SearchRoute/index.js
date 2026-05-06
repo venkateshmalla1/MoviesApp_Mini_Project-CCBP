@@ -64,12 +64,8 @@ class SearchRoute extends Component {
   }
 
   getSearchResultsView = () => {
-    const {
-      apiStatus,
-      searchedMoviesList,
-      fetchingDone,
-      searchedText,
-    } = this.state
+    const {apiStatus, searchedMoviesList, fetchingDone, searchedText} =
+      this.state
     switch (apiStatus) {
       case apiConstants.success:
         // && fetchingDone
