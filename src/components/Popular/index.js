@@ -88,7 +88,7 @@ class Popular extends Component {
         return (
           // testid='loader'
           <div
-            testid="loader"
+            data-testid="loader"
             className="popular-movies-page-loading-or-failure-container"
           >
             <Loader type="TailSpin" color="#D81F26" height={50} width={50} />

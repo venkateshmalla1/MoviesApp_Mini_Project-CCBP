@@ -205,7 +205,10 @@ class Home extends Component {
 
   getLoadingView = () => (
     // testid='loader'
-    <div testid="loader" className="top-container-failure-or-loading-container">
+    <div
+      data-testid="loader"
+      className="top-container-failure-or-loading-container"
+    >
       <Loader type="TailSpin" color="#D81F26" height={50} width={50} />
     </div>
   )
@@ -217,9 +220,7 @@ class Home extends Component {
         return (
           <div className="top-container-middle-text-container">
             <h1 className="movie-poster-heading">{homePageMovie.title}</h1>
-            <h1 className="movie-poster-description">
-              {homePageMovie.overview}
-            </h1>
+            <p className="movie-poster-description">{homePageMovie.overview}</p>
             <button className="play-button" type="button">
               Play
             </button>

@@ -80,8 +80,8 @@ class Header extends Component {
           />
           <div className="search-button-container">
             <button
-              testid="searchButton"
-              // onClick={this.onSearchBtnClick}
+              data-testid="searchButton"
+              onClick={this.onSearchBtnClick}
               className="search-icon-button"
               type="submit"
             >
@@ -93,7 +93,7 @@ class Header extends Component {
     }
     return (
       <button
-        testid="searchButton"
+        data-testid="searchButton"
         onClick={this.navigateToSearchRoute}
         className="search-icon-button"
         type="button"
