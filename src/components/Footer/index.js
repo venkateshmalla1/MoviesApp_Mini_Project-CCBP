@@ -5,10 +5,10 @@ import './index.css'
 const Footer = () => (
   <footer className="footer-container">
     <div className="social-media-icons-container">
-      <FaGoogle className="social-media-icons" />
-      <FaTwitter className="social-media-icons" />
-      <FaInstagram className="social-media-icons" />
-      <FaYoutube className="social-media-icons" />
+      <FaGoogle className="social-media-icons" role="img" />
+      <FaTwitter className="social-media-icons" role="img" />
+      <FaInstagram className="social-media-icons" role="img" />
+      <FaYoutube className="social-media-icons" role="img" />
     </div>
     <p className="contact-us-text">Contact us</p>
   </footer>

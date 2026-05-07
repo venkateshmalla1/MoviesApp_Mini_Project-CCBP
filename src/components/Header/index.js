@@ -37,7 +37,7 @@ class Header extends Component {
     e.preventDefault()
     const {searchInput} = this.state
     const {searchMovies} = this.props
-    if (searchInput !== '') {
+    if (searchInput !== '' && searchMovies !== undefined) {
       searchMovies(searchInput)
     }
   }
@@ -53,10 +53,7 @@ class Header extends Component {
 
     if (path === tabPathConstants.search) {
       return (
-        <form
-          onSubmit={this.onSearchBtnClick}
-          className="search-bar-icon-container"
-        >
+        <div className="search-bar-icon-container">
           <input
             onChange={this.onSearchInput}
             value={searchInput}
@@ -64,16 +61,15 @@ class Header extends Component {
             type="search"
             className="search-input"
           />
-          <div className="search-button-container">
-            <button
-              data-testid="searchButton"
-              className="search-icon-button"
-              type="submit"
-            >
-              <HiOutlineSearch className="search-icon-alone" />
-            </button>
-          </div>
-        </form>
+          <button
+            data-testid="searchButton"
+            className="search-icon-button"
+            type="button"
+            onClick={this.onSearchBtnClick}
+          >
+            <HiOutlineSearch className="search-icon-alone" />
+          </button>
+        </div>
       )
     }
     return (
@@ -83,10 +79,7 @@ class Header extends Component {
         className="search-icon-button"
         type="button"
       >
-        <HiOutlineSearch
-          id="searchIcon"
-          className="search-icon-alone search-icon-for-hover"
-        />
+        <HiOutlineSearch className="search-icon-alone" />
       </button>
     )
   }
@@ -105,71 +98,78 @@ class Header extends Component {
     return (
       <nav className="header-nav-bar">
         <div className="nav-items-container">
-          <Link className="logo-nav-link" to="/">
-            <img
-              className="header-movies-logo"
-              src="https://res.cloudinary.com/dlygjzdo7/image/upload/v1672990957/Netflix%20Clone%20App/Login/login_movies_logo_ngzlug.png"
-              alt="website logo"
-            />
-          </Link>
-          <div className="menu-options-and-search-avatar-container">
+          <div className="logo-container">
+            <Link to="/">
+              <img
+                className="header-movies-logo"
+                src="https://res.cloudinary.com/dk6x9gpyl/image/upload/v1778093943/Group_7399_1_by8d7y.png"
+                alt="website logo"
+              />
+            </Link>
             <ul className="menu-options-container">
-              <li className={`menu-option ${homeClass}`}>
-                <Link className="menu-option-nav-link-item" to="/">
+              <li className="menu-option" key="home">
+                <Link className={`menu-option-nav-link-item ${homeClass}`} to="/">
                   Home
                 </Link>
               </li>
-              <li className={`menu-option ${popularClass}`}>
-                <Link className="menu-option-nav-link-item" to="/popular">
+              <li className="menu-option" key="popular">
+                <Link
+                  className={`menu-option-nav-link-item ${popularClass}`}
+                  to="/popular"
+                >
                   Popular
                 </Link>
               </li>
             </ul>
-            <div className="search-avatar-container">
-              {this.togglingSearchBarDisplayResult()}
-              <div className="profile-container">
-                <Link className="profile-nav-link-item" to="/account">
-                  <img
-                    alt="profile"
-                    className="header-avatar"
-                    src="https://res.cloudinary.com/dlygjzdo7/image/upload/v1673088070/Netflix%20Clone%20App/Header/header_avatar_qistmq.svg"
-                  />
-                </Link>
-              </div>
-              <button
-                onClick={this.toggleHamburgerMenuDisplay}
-                type="button"
-                className="hamburger-button"
-              >
-                <GiHamburgerMenu className="hamburger-icon" />
-              </button>
-            </div>
+          </div>
+          <div className="search-avatar-container">
+            {this.togglingSearchBarDisplayResult()}
+            <Link to="/account">
+              <img
+                alt="profile"
+                className="header-avatar"
+                src="https://res.cloudinary.com/dlygjzdo7/image/upload/v1673088070/Netflix%20Clone%20App/Header/header_avatar_qistmq.svg"
+              />
+            </Link>
+            <button
+              onClick={this.toggleHamburgerMenuDisplay}
+              type="button"
+              className="hamburger-button"
+            >
+              <GiHamburgerMenu className="hamburger-icon" />
+            </button>
           </div>
         </div>
         {displayHamburgerMenu && (
           <ul className="menu-items-list-mobile-view-container">
-            <li className={`menu-option-mobile ${homeClass}`}>
-              <Link className="menu-option-nav-link-item" to="/">
+            <li className="menu-option-mobile" key="home">
+              <Link className={`menu-option-nav-link-item ${homeClass}`} to="/">
                 Home
               </Link>
             </li>
-            <li className={`menu-option-mobile ${popularClass}`}>
-              <Link className="menu-option-nav-link-item" to="/popular">
+            <li className="menu-option-mobile" key="popular">
+              <Link
+                className={`menu-option-nav-link-item ${popularClass}`}
+                to="/popular"
+              >
                 Popular
               </Link>
             </li>
-            <li className={`menu-option-mobile ${accountClass}`}>
-              <Link className="menu-option-nav-link-item" to="/account">
+            <li className="menu-option-mobile" key="account">
+              <Link
+                className={`menu-option-nav-link-item ${accountClass}`}
+                to="/account"
+              >
                 Account
               </Link>
             </li>
-            <li className="close-menu-option">
+            <li className="close-menu-option" key="close">
               <button
                 onClick={this.collapseHamburgerMenu}
                 className="close-button"
                 type="button"
               >
-                <RiCloseFill color="#ffffff" className="close-icon" />
+                <RiCloseFill size={25} color="#ffffff" />
               </button>
             </li>
           </ul>
