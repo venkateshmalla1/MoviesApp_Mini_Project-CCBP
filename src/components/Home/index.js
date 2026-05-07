@@ -3,11 +3,14 @@ import {Redirect} from 'react-router-dom'
 import Loader from 'react-loader-spinner'
 import Slider from 'react-slick'
 import Cookies from 'js-cookie'
-// import {TiWarning} from 'react-icons/ti'
+
+// MUST IMPORT THESE FOR HORIZONTAL ALIGNMENT
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
+
 import Header from '../Header'
 import MovieItem from '../MovieItem'
 import RecentMovieItem from '../RecentMovieItem'
-
 import Footer from '../Footer'
 
 import './index.css'
@@ -21,40 +24,23 @@ const apiConstants = {
 
 const settings = {
   dots: false,
-  infinite: false,
+  infinite: true,
   speed: 500,
   slidesToShow: 4,
   slidesToScroll: 1,
-  autoplay: true,
-
+  swipeToSlide: true,
   responsive: [
     {
-      breakpoint: 1124,
-      settings: {
-        slidesToShow: 4,
-        slidesToScroll: 1,
-      },
-    },
-    {
-      breakpoint: 946,
-      settings: {
-        slidesToShow: 3,
-        slidesToScroll: 1,
-      },
+      breakpoint: 1024,
+      settings: {slidesToShow: 4, slidesToScroll: 1},
     },
     {
       breakpoint: 768,
-      settings: {
-        slidesToShow: 3,
-        slidesToScroll: 1,
-      },
+      settings: {slidesToShow: 3, slidesToScroll: 1},
     },
     {
-      breakpoint: 544,
-      settings: {
-        slidesToShow: 2,
-        slidesToScroll: 1,
-      },
+      breakpoint: 480,
+      settings: {slidesToShow: 2, slidesToScroll: 1},
     },
   ],
 }
@@ -82,264 +68,148 @@ class Home extends Component {
     title: eachMovie.title,
   })
 
-  getRandomMovie = trendingMoviesList => {
-    const randomIndex = Math.floor(Math.random() * trendingMoviesList.length)
-    // console.log(randomIndex)
-    return trendingMoviesList[randomIndex]
-  }
-
   getTrendingNowMoviesList = async () => {
     this.setState({trendingApiStatus: apiConstants.inProgress})
     const jwtToken = Cookies.get('jwt_token')
-    const tendingMoviesApiUrl =
-      'https://apis.ccbp.in/movies-app/trending-movies'
-    const options = {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
+    const response = await fetch(
+      'https://apis.ccbp.in/movies-app/trending-movies',
+      {
+        headers: {Authorization: `Bearer ${jwtToken}`},
       },
-    }
-    const response = await fetch(tendingMoviesApiUrl, options)
-
-    // // console.log(response)
-    // // console.log(data)
+    )
     if (response.ok) {
       const data = await response.json()
-      const formattedTrendingMoviesList = data.results.map(eachMovie =>
-        this.getFormattedMovieData(eachMovie),
-      )
-      // console.log(formattedTrendingMoviesList)
-
+      const formattedData = data.results.map(this.getFormattedMovieData)
       this.setState({
-        trendingMoviesList: formattedTrendingMoviesList,
+        trendingMoviesList: formattedData,
         trendingApiStatus: apiConstants.success,
       })
     } else {
-      this.setState({
-        trendingApiStatus: apiConstants.failure,
-      })
+      this.setState({trendingApiStatus: apiConstants.failure})
     }
   }
 
   getOriginalsMoviesList = async () => {
     this.setState({originalsApiStatus: apiConstants.inProgress})
     const jwtToken = Cookies.get('jwt_token')
-    const originalsMoviesApiUrl = 'https://apis.ccbp.in/movies-app/originals'
-    const options = {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    }
-    const response = await fetch(originalsMoviesApiUrl, options)
-
-    // console.log(response)
-    // console.log(data)
+    const response = await fetch('https://apis.ccbp.in/movies-app/originals', {
+      headers: {Authorization: `Bearer ${jwtToken}`},
+    })
     if (response.ok) {
       const data = await response.json()
-      const formattedOriginalsMoviesList = data.results.map(eachMovie =>
-        this.getFormattedMovieData(eachMovie),
-      )
-      // console.log(formattedOriginalsMoviesList)
-      const homePageMovie = this.getRandomMovie(formattedOriginalsMoviesList)
-      // const unformattedHomePageMovie = this.getRandomMovie(data.results)
-      // const homePageMovie = this.getFormattedMovieData(unformattedHomePageMovie)
+      const formattedData = data.results.map(this.getFormattedMovieData)
       this.setState({
-        originalsMoviesList: formattedOriginalsMoviesList,
-        homePageMovie,
+        originalsMoviesList: formattedData,
+        homePageMovie:
+          formattedData[Math.floor(Math.random() * formattedData.length)],
         dataFetched: true,
         originalsApiStatus: apiConstants.success,
       })
     } else {
-      this.setState({
-        originalsApiStatus: apiConstants.failure,
-      })
+      this.setState({originalsApiStatus: apiConstants.failure})
     }
   }
 
-  refetchOriginalsData = () => {
-    this.getOriginalsMoviesList()
-  }
-
-  refetchTrendingData = () => {
-    this.getTrendingNowMoviesList()
-  }
-
-  getTrendingErrorView = () => (
-    <div className="top-container-failure-or-loading-container">
-      <img
-        src="https://res.cloudinary.com/dlygjzdo7/image/upload/v1673696599/Netflix%20Clone%20App/Failure%20Views/alert-icon_fjdzey.png"
-        className="warning-icon-bottom"
-        alt="failure view"
-      />
-      <p className="failure-text-bottom">
-        Something went wrong. Please try again
-      </p>
-      <button
-        onClick={this.refetchTrendingData}
-        type="button"
-        className="try-again-button-bottom"
-      >
-        Try Again
-      </button>
-    </div>
-  )
-
-  getPosterOriginalsErrorView = () => (
-    <div className="top-container-failure-or-loading-container">
-      <img
-        src="https://res.cloudinary.com/dlygjzdo7/image/upload/v1673696599/Netflix%20Clone%20App/Failure%20Views/alert-icon_fjdzey.png"
-        className="warning-icon-bottom"
-        alt="failure view"
-      />
-      <p className="failure-text-bottom">
-        Something went wrong. Please try again
-      </p>
-      <button
-        onClick={this.refetchOriginalsData}
-        type="button"
-        className="try-again-button-bottom"
-      >
-        Try Again
-      </button>
-    </div>
-  )
-
-  getLoadingView = () => (
-    // testid='loader'
-    <div
-      data-testid="loader"
-      className="top-container-failure-or-loading-container"
-    >
-      <Loader type="TailSpin" color="#D81F26" height={50} width={50} />
-    </div>
-  )
-
-  getTopContainerView = () => {
-    const {homePageMovie, originalsApiStatus} = this.state
-    switch (originalsApiStatus) {
+  renderSlider = (status, list, retryFn) => {
+    switch (status) {
       case apiConstants.success:
         return (
-          <div className="top-container-middle-text-container">
-            <h1 className="movie-poster-heading">{homePageMovie.title}</h1>
-            <p className="movie-poster-description">{homePageMovie.overview}</p>
-            <button className="play-button" type="button">
-              Play
-            </button>
-          </div>
-        )
-      case apiConstants.inProgress:
-        return this.getLoadingView()
-      case apiConstants.failure:
-        return this.getPosterOriginalsErrorView()
-
-      default:
-        return null
-    }
-  }
-
-  originalsView = () => {
-    const {originalsApiStatus, originalsMoviesList} = this.state
-    switch (originalsApiStatus) {
-      case apiConstants.success:
-        return (
-          <div>
+          <div className="slick-container">
             <Slider {...settings}>
-              {originalsMoviesList.map(eachMovie => (
-                <MovieItem movieDetails={eachMovie} key={eachMovie.id} />
+              {list.map(movie => (
+                <MovieItem movieDetails={movie} key={movie.id} />
               ))}
             </Slider>
           </div>
         )
       case apiConstants.inProgress:
-        return this.getLoadingView()
-      case apiConstants.failure:
-        return this.getPosterOriginalsErrorView()
-
-      default:
-        return null
-    }
-  }
-
-  trendingMoviesView = () => {
-    const {trendingApiStatus, trendingMoviesList} = this.state
-    switch (trendingApiStatus) {
-      case apiConstants.success:
         return (
-          <Slider {...settings}>
-            {trendingMoviesList.map(eachMovie => (
-              <MovieItem movieDetails={eachMovie} key={eachMovie.id} />
-            ))}
-          </Slider>
+          <div className="loader-container" data-testid="loader">
+            <Loader type="TailSpin" color="#D81F26" height={50} width={50} />
+          </div>
         )
-      case apiConstants.inProgress:
-        return this.getLoadingView()
       case apiConstants.failure:
-        return this.getTrendingErrorView()
+        return (
+          <div className="error-view-container">
+            <img
+              src="https://res.cloudinary.com/dlygjzdo7/image/upload/v1673696599/alert-icon_fjdzey.png"
+              alt="failure view"
+              className="error-icon"
+            />
+            <p>Something went wrong. Please try again</p>
+            <button onClick={retryFn} type="button" className="retry-btn">
+              Try Again
+            </button>
+          </div>
+        )
       default:
         return null
     }
   }
 
   render() {
-    if (Cookies.get('jwt_token') === undefined) {
-      return <Redirect to="/login" />
-    }
+    const jwtToken = Cookies.get('jwt_token')
+    if (jwtToken === undefined) return <Redirect to="/login" />
 
-    const {homePageMovie, dataFetched} = this.state
+    const {
+      homePageMovie,
+      dataFetched,
+      trendingMoviesList,
+      originalsMoviesList,
+      trendingApiStatus,
+      originalsApiStatus,
+    } = this.state
+    const recentMovies = JSON.parse(localStorage.getItem('recentMovies'))
 
-    // console.log(homePageMovie)
-
-    // recentMovies extraction from localStorage
-
-    const recentMoviesString = localStorage.getItem('recentMovies')
-    const recentMovies = JSON.parse(recentMoviesString)
-    console.log(recentMovies)
-
-    const ImageUrl = dataFetched ? `url(${homePageMovie.backdropPath})` : ''
-
-    const bgOrLinearGrad = dataFetched
-      ? `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(24, 24, 24, 0.246875) 28.26%, #181818 92.82%, #181818 98.68%, #181818 108.61%)`
-      : ''
+    const bgImage = dataFetched ? `url(${homePageMovie.backdropPath})` : ''
+    const bgOverlay = `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #181818 100%)`
 
     return (
-      <div className="home-page-container">
+      <div className="home-page-container page-animation">
         <div
           className="home-page-top-container"
-          style={{
-            backgroundImage: `${bgOrLinearGrad}, ${ImageUrl}`,
-            backgroundSize: '100% 100%',
-            backgroundRepeat: 'no-repeat',
-          }}
+          style={{backgroundImage: `${bgOverlay}, ${bgImage}`}}
         >
           <Header />
-          {this.getTopContainerView()}
-          {/* <div className="top-container-bottom-blur-container">
-              transparent
-            </div> */}
+          {originalsApiStatus === apiConstants.success && (
+            <div className="top-container-content">
+              <h1 className="movie-title">{homePageMovie.title}</h1>
+              <p className="movie-overview">{homePageMovie.overview}</p>
+              <button className="play-btn" type="button">
+                Play
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="home-page-bottom-container">
-          <div className="trending-movies-container">
-            <h1 className="trending-now-movies-heading">Trending Now</h1>
+          <section className="movie-section">
+            <h1 className="section-heading">Trending Now</h1>
+            {this.renderSlider(
+              trendingApiStatus,
+              trendingMoviesList,
+              this.getTrendingNowMoviesList,
+            )}
+          </section>
 
-            {this.trendingMoviesView()}
-          </div>
-          <div className="originals-movies-container">
-            <h1 className="originals-heading">Originals</h1>
+          <section className="movie-section">
+            <h1 className="section-heading">Originals</h1>
+            {this.renderSlider(
+              originalsApiStatus,
+              originalsMoviesList,
+              this.getOriginalsMoviesList,
+            )}
+          </section>
 
-            {this.originalsView()}
-          </div>
-          {recentMovies !== null && (
-            <div className="recent-movies-container">
-              <h1 className="recent-movies-heading">Recent Movies</h1>
-              <ul className="all-recent-movies-container">
-                {recentMovies.map(eachMovie => (
-                  <RecentMovieItem
-                    movieDetails={eachMovie}
-                    key={eachMovie.id}
-                  />
+          {recentMovies && (
+            <section className="movie-section">
+              <h1 className="section-heading">Recent Movies</h1>
+              <ul className="recent-movies-grid">
+                {recentMovies.map(movie => (
+                  <RecentMovieItem movieDetails={movie} key={movie.id} />
                 ))}
               </ul>
-            </div>
+            </section>
           )}
         </div>
         <Footer />

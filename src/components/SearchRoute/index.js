@@ -72,8 +72,12 @@ class SearchRoute extends Component {
   }
 
   getSearchResultsView = () => {
-    const {apiStatus, searchedMoviesList, fetchingDone, searchedText} =
-      this.state
+    const {
+      apiStatus,
+      searchedMoviesList,
+      fetchingDone,
+      searchedText,
+    } = this.state
 
     switch (apiStatus) {
       case apiConstants.success:
@@ -92,10 +96,7 @@ class SearchRoute extends Component {
         ) : (
           <ul className="search-route-bottom-container">
             {searchedMoviesList.map(eachMovie => (
-              <li
-                className="searched-movie-image-container"
-                key={eachMovie.id}
-              >
+              <li className="searched-movie-image-container" key={eachMovie.id}>
                 <Link to={`/movies/${eachMovie.id}`}>
                   <img
                     data-testid="movieItem"
@@ -149,7 +150,7 @@ class SearchRoute extends Component {
 
   render() {
     return (
-      <div className="search-route-page-main-container">
+      <div className="search-route-page-main-container page-animation">
         <Header searchMovies={this.searchMovies} />
         {this.getSearchResultsView()}
       </div>

@@ -1,15 +1,21 @@
+import {Link} from 'react-router-dom'
 import './index.css'
 
 const SimilarMovieItem = props => {
   const {similarMovieDetails} = props
-  const {posterPath, title} = similarMovieDetails
+  const {posterPath, title, id} = similarMovieDetails
+
   return (
-    <img
-      data-testid="movieItem"
-      alt={title}
-      className="similar-movie-image"
-      src={posterPath}
-    />
+    <li className="similar-movie-list-item">
+      <Link to={`/movies/${id}`}>
+        <img
+          data-testid="movieItem"
+          alt={title}
+          className="similar-movie-image"
+          src={posterPath}
+        />
+      </Link>
+    </li>
   )
 }
 

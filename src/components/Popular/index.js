@@ -69,7 +69,7 @@ class Popular extends Component {
     switch (apiStatus) {
       case apiConstants.success:
         return (
-          <ul className="popular-movies-container">
+          <ul className="popular-movies-container page-animation">
             {popularMoviesList.map(eachMovie => (
               <li className="each-movie-list-item" key={eachMovie.id}>
                 <Link to={`/movies/${eachMovie.id}`}>

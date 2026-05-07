@@ -28,6 +28,17 @@ class MovieItemDetails extends Component {
     this.getSpecificMovieDetails()
   }
 
+  componentDidUpdate(prevProps) {
+    const {match} = this.props
+    const {id} = match.params
+    const prevId = prevProps.match.params.id
+
+    if (id !== prevId) {
+      this.getSpecificMovieDetails()
+      window.scrollTo(0, 0)
+    }
+  }
+
   getFormattedMovieDetails = movieDetails => ({
     adult: movieDetails.adult,
     backdropPath: movieDetails.backdrop_path,
@@ -55,95 +66,52 @@ class MovieItemDetails extends Component {
   })
 
   getSpecificMovieDetails = async () => {
-    this.setState({
-      apiStatus: apiConstants.inProgress,
-    })
+    this.setState({apiStatus: apiConstants.inProgress})
+
     const {match} = this.props
-    // console.log(this.props)
-    const {params} = match
-    const {id} = params
-    const movieDetailsApiUrl = `https://apis.ccbp.in/movies-app/movies/${id}`
+    const {id} = match.params
     const jwtToken = Cookies.get('jwt_token')
+    const movieDetailsApiUrl = `https://apis.ccbp.in/movies-app/movies/${id}`
+
     const options = {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
+      headers: {Authorization: `Bearer ${jwtToken}`},
+      method: 'GET',
     }
 
     const response = await fetch(movieDetailsApiUrl, options)
-
-    // console.log(data)
-    // movieDetails
-
-    //  for finding duplicates
-
-    const findMoviePresentOrNot = (moviesArray, movieId) => {
-      const result = moviesArray.findIndex(
-        eachMovie => eachMovie.id === movieId,
-      )
-      if (result === -1) {
-        return true
-      }
-      return false
-    }
 
     if (response.ok) {
       const data = await response.json()
       const formattedMovieDetails = this.getFormattedMovieDetails(
         data.movie_details,
       )
-      // console.log(formattedMovieDetails)
-      // recentMovies
-      let recentMovies = localStorage.getItem('recentMovies')
-      if (recentMovies !== null) {
-        recentMovies = JSON.parse(recentMovies)
-        if (recentMovies.length === 3) {
-          recentMovies.pop()
-        }
-      }
-      console.log(recentMovies)
-      let recentMoviesArray
-      if (recentMovies === null) {
-        recentMoviesArray = [
-          {
-            moviePoster: formattedMovieDetails.backdropPath,
-            id: formattedMovieDetails.id,
-          },
-        ]
-      } else if (recentMovies.length === 0) {
-        recentMoviesArray = [
-          {
-            moviePoster: formattedMovieDetails.backdropPath,
-            id: formattedMovieDetails.id,
-          },
-        ]
-      } else if (
-        findMoviePresentOrNot(recentMovies, formattedMovieDetails.id)
-      ) {
-        recentMoviesArray = [
-          {
-            moviePoster: formattedMovieDetails.backdropPath,
-            id: formattedMovieDetails.id,
-          },
-          ...recentMovies,
-        ]
+
+      const recentMoviesString = localStorage.getItem('recentMovies')
+      let recentMoviesArray = recentMoviesString
+        ? JSON.parse(recentMoviesString)
+        : []
+
+      recentMoviesArray = recentMoviesArray.filter(
+        movie => movie.id !== formattedMovieDetails.id,
+      )
+
+      recentMoviesArray.unshift({
+        moviePoster: formattedMovieDetails.backdropPath,
+        id: formattedMovieDetails.id,
+      })
+
+      if (recentMoviesArray.length > 3) {
+        recentMoviesArray.pop()
       }
 
-      if (recentMoviesArray !== undefined) {
-        const dataToBeStored = JSON.stringify(recentMoviesArray)
-        localStorage.setItem('recentMovies', dataToBeStored)
-      }
+      localStorage.setItem('recentMovies', JSON.stringify(recentMoviesArray))
 
-      // similar movie details
       const formattedSimilarMoviesList = data.movie_details.similar_movies.map(
         eachMovie => this.getFormattedSimilarMovie(eachMovie),
       )
-      // console.log(formattedSimilarMoviesList)
-      // spoken languages
       const formattedSpokenLanguagesList = data.movie_details.spoken_languages.map(
         eachLanguage => this.getFormattedSpokenLanguagesList(eachLanguage),
       )
-      // console.log(formattedSpokenLanguagesList)
 
       this.setState({
         movieDetails: formattedMovieDetails,
@@ -153,34 +121,27 @@ class MovieItemDetails extends Component {
         apiStatus: apiConstants.success,
       })
     } else {
-      this.setState({
-        apiStatus: apiConstants.failure,
-      })
+      this.setState({apiStatus: apiConstants.failure})
     }
   }
 
   formattedMovieDuration = runtime => {
-    if (runtime < 60) {
-      return `${runtime}m`
-    }
-    const hours = Math.trunc(runtime / 60)
+    const hours = Math.floor(runtime / 60)
     const minutes = runtime % 60
+    if (hours === 0) return `${minutes}m`
     return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`
   }
 
   getFormattedDate = releaseDate => {
-    if (releaseDate !== undefined) {
-      // const dateObj = new Date(releaseDate)
-      const formattedDate = format(new Date(releaseDate), 'do MMMM yyyy')
-      // console.log(formattedDate)
-      return formattedDate
+    if (!releaseDate) return ''
+    try {
+      return format(new Date(releaseDate), 'do MMMM yyyy')
+    } catch (e) {
+      return ''
     }
-    return ''
   }
 
-  refetchMovieDetails = () => {
-    this.getSpecificMovieDetails()
-  }
+  refetchMovieDetails = () => this.getSpecificMovieDetails()
 
   getMovieDetailsResultantView = () => {
     const {
@@ -191,31 +152,33 @@ class MovieItemDetails extends Component {
       apiStatus,
     } = this.state
 
-    const {
-      // backdropPath,
-      backdropPath,
-      overview,
-      voteCount,
-      voteAverage,
-      budget,
-      releaseDate,
-      runtime,
-      adult,
-      title,
-    } = movieDetails
-    const duration = this.formattedMovieDuration(runtime)
-    const releaseYear = new Date(releaseDate).getFullYear()
-    const certification = adult ? 'A' : 'U/A'
-    const formattedDate = this.getFormattedDate(releaseDate)
     switch (apiStatus) {
-      case apiConstants.success:
+      case apiConstants.success: {
+        const {
+          backdropPath,
+          overview,
+          voteCount,
+          voteAverage,
+          budget,
+          releaseDate,
+          runtime,
+          adult,
+          title,
+        } = movieDetails
+        const duration = this.formattedMovieDuration(runtime)
+        const releaseYear = releaseDate
+          ? new Date(releaseDate).getFullYear()
+          : ''
+        const certification = adult ? 'A' : 'U/A'
+        const formattedDate = this.getFormattedDate(releaseDate)
+
         return (
           <>
             <div
               className="movie-item-poster-container"
               style={{
                 backgroundImage: `linear-gradient(90.33deg, #181818 -6.5%, rgba(24, 24, 24, 0.6) 57.15%, rgba(24, 24, 24, 0) 99.77%), url(${backdropPath})`,
-                backgroundSize: '100% 100%',
+                backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
               }}
             >
@@ -225,7 +188,7 @@ class MovieItemDetails extends Component {
                 <div className="movie-duration-certification-release-year-container">
                   <p className="movie-duration">{duration}</p>
                   <p className="movie-certificate">{certification}</p>
-                  <p className="release-year">{`${releaseYear}`}</p>
+                  <p className="release-year">{releaseYear}</p>
                 </div>
                 <p className="movie-overview">{overview}</p>
                 <button className="play-button-in-movie-details" type="button">
@@ -237,23 +200,23 @@ class MovieItemDetails extends Component {
               <div className="all-labels-and-info-container">
                 <div className="one-content-label-and-info-container">
                   <h3 className="content-label-text">Genres</h3>
-                  <ul className="genres-list-container">
-                    {genres.map(eachGenre => (
-                      <p className="info-text" key={eachGenre.id}>
-                        {eachGenre.name}
+                  <div className="genres-list-container">
+                    {genres.map(genre => (
+                      <p className="info-text" key={genre.id}>
+                        {genre.name}
                       </p>
                     ))}
-                  </ul>
+                  </div>
                 </div>
                 <div className="one-content-label-and-info-container">
                   <h3 className="content-label-text">Audio Available</h3>
-                  <ul className="genres-list-container">
-                    {spokenLanguages.map(eachLang => (
-                      <p className="info-text" key={eachLang.id}>
-                        {eachLang.englishName}
+                  <div className="genres-list-container">
+                    {spokenLanguages.map(lang => (
+                      <p className="info-text" key={lang.id}>
+                        {lang.englishName}
                       </p>
                     ))}
-                  </ul>
+                  </div>
                 </div>
                 <div className="two-content-label-and-info-container">
                   <h3 className="content-label-text">Rating Count</h3>
@@ -270,10 +233,10 @@ class MovieItemDetails extends Component {
               </div>
               <h3 className="similar-movies-heading">More like this</h3>
               <ul className="similar-movies-list-container">
-                {similarMovies.map(eachMovie => (
+                {similarMovies.map(movie => (
                   <SimilarMovieItem
-                    similarMovieDetails={eachMovie}
-                    key={eachMovie.id}
+                    similarMovieDetails={movie}
+                    key={movie.id}
                   />
                 ))}
               </ul>
@@ -281,6 +244,8 @@ class MovieItemDetails extends Component {
             </div>
           </>
         )
+      }
+
       case apiConstants.inProgress:
         return (
           <>
@@ -293,6 +258,7 @@ class MovieItemDetails extends Component {
             </div>
           </>
         )
+
       case apiConstants.failure:
         return (
           <>

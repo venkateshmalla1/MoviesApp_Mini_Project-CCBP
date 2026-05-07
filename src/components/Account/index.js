@@ -15,7 +15,7 @@ const Account = props => {
   }
 
   return (
-    <div className="account-page-main-container">
+    <div className="account-page-main-container page-animation">
       <Header />
       <div className="account-details-container">
         <h2 className="account-heading">Account</h2>
